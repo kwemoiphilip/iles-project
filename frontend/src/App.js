@@ -1,14 +1,50 @@
-import Dashboard from "./pages/Dashboard";
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
 import Login from "./pages/Login";
-import { useState } from "react";
+import Dashboard from "./pages/Dashboard";
+import WeeklyLogbook from "./pages/WeeklyLogbook";
+import Placements from "./pages/Placements";
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  return token ? (
-    <Dashboard />
-  ) : (
-    <Login setToken={setToken} />
+  return (
+    <Router>
+      <Routes>
+
+        {/* LOGIN */}
+        <Route
+          path="/"
+          element={<Login setToken={setToken} />}
+        />
+
+        {/* DASHBOARD (PROTECTED) */}
+        <Route
+          path="/dashboard"
+          element={
+            token ? <Dashboard /> : <Navigate to="/" />
+          }
+        />
+
+        {/* PLACEMENTS */}
+        <Route
+          path="/placements"
+          element={
+            token ? <Placements /> : <Navigate to="/" />
+          }
+        />
+
+        {/* WEEKLY LOGBOOK */}
+        <Route
+          path="/logs"
+          element={
+            token ? <WeeklyLogbook /> : <Navigate to="/" />
+          }
+        />
+
+      </Routes>
+    </Router>
   );
 }
 

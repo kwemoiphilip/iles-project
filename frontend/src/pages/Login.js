@@ -5,37 +5,52 @@ function Login({ setToken }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    axios.post("http://127.0.0.1:8000/api/token/", {
-      username,
-      password,
-    })
-    .then((res) => {
-  const token = res.data.access;
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  // decode token
-  const payload = JSON.parse(atob(token.split('.')[1]));
+    try {
+      const res = await axios.post(
+        "http://127.0.0.1:8000/api/token/",
+        {
+          username,
+          password,
+        }
+      );
 
-  localStorage.setItem("token", token);
-  localStorage.setItem("role", payload.role);
-  localStorage.setItem("username", payload.username);
+      const token = res.data.access;
 
-  setToken(token);
-});
+      localStorage.setItem("token", token);
+
+      // IMPORTANT FIX
+      if (typeof setToken === "function") {
+        setToken(token);
+      }
+
+      alert("Login successful!");
+      window.location.href = "/dashboard";
+    } catch (err) {
+      console.log(err.response?.data);
+      alert("Login failed");
+    }
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Login</h2>
+    <form onSubmit={handleLogin}>
+      <input
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
 
-      <input placeholder="Username" onChange={(e) => setUsername(e.target.value)} />
-      <br /><br />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
-      <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
-      <br /><br />
-
-      <button onClick={handleLogin}>Login</button>
-    </div>
+      <button type="submit">Login</button>
+    </form>
   );
 }
 
